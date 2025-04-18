@@ -20,6 +20,7 @@ class SettingsFragment : Fragment() {
     private var mainActivity: MainActivity? = null;
     private var activeInput: EditText? = null;
     private var restInput: EditText? = null;
+    private var roundsCountInput: EditText? = null;
 
     override fun onAttach(context: Context) {
         super.onAttach(context);
@@ -103,7 +104,7 @@ class SettingsFragment : Fragment() {
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        if (activeInput == null || restInput == null) {
+        if (activeInput == null || restInput == null || roundsCountInput == null) {
             return;
         }
         outState.putInt(
@@ -127,7 +128,7 @@ class SettingsFragment : Fragment() {
     override fun onDestroy() {
         super.onDestroy();
 
-        if (activeInput == null || restInput == null) {
+        if (activeInput == null || restInput == null || roundsCountInput == null) {
             return;
         }
         mainActivity!!.savePreferences(
