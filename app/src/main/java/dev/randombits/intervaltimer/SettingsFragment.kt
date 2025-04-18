@@ -11,8 +11,10 @@ import androidx.fragment.app.Fragment
 
 private const val ARG_PARAM1 = "active";
 private const val ARG_PARAM2 = "rest";
+private const val ARG_PARAM3 = "rounds";
 
 class SettingsFragment : Fragment() {
+    private var defaultRoundsCount: Int = 0;  // Unlimited rounds
     private var defaultActiveTime: Int = 45;
     private var defaultRestTime: Int = 15;
     private var mainActivity: MainActivity? = null;
@@ -30,6 +32,7 @@ class SettingsFragment : Fragment() {
         arguments?.let {
             defaultActiveTime = it.getInt(ARG_PARAM1);
             defaultRestTime = it.getInt(ARG_PARAM2);
+            defaultRoundsCount = it.getInt(ARG_PARAM3);
         }
     }
 
@@ -48,6 +51,8 @@ class SettingsFragment : Fragment() {
         activeInput!!.setText(defaultActiveTime.toString());
         restInput = view.findViewById(R.id.restTime);
         restInput!!.setText(defaultRestTime.toString());
+        roundsCountInput = view.findViewById(R.id.roundsCount);
+        roundsCountInput!!.setText(defaultRoundsCount.toString());
 
         view.findViewById<View>(R.id.activeTime_less).setOnClickListener {
             changeActiveValue(activeInput!!, defaultActiveTime, -5);
@@ -57,12 +62,20 @@ class SettingsFragment : Fragment() {
             changeRestValue(restInput!!, defaultRestTime, -5);
         }
 
+        view.findViewById<View>(R.id.roundsCount_less).setOnClickListener {
+            changeRoundsCountValue(roundsCountInput!!, defaultRoundsCount, -1);
+        }
+
         view.findViewById<View>(R.id.activeTime_more).setOnClickListener {
             changeActiveValue(activeInput!!, defaultActiveTime, 5);
         }
 
         view.findViewById<View>(R.id.restTime_more).setOnClickListener {
             changeRestValue(restInput!!, defaultRestTime, 5);
+        }
+
+        view.findViewById<View>(R.id.roundsCount_more).setOnClickListener {
+            changeRoundsCountValue(roundsCountInput!!, defaultRoundsCount, 1);
         }
 
         view.findViewById<View>(R.id.beginBtn).setOnClickListener { startTimer(); };
@@ -82,6 +95,13 @@ class SettingsFragment : Fragment() {
         editText.setText(newValue.toString());
     }
 
+    @SuppressLint("SetTextI18n")
+    private fun changeRoundsCountValue(editText: EditText, defaultValue: Int, change: Int) {
+        val currentValue = editText.text.toString().toIntOrNull() ?: defaultValue;
+        val newValue = (currentValue + change).coerceAtLeast(5);
+        editText.setText(newValue.toString());
+    }
+
     override fun onSaveInstanceState(outState: Bundle) {
         if (activeInput == null || restInput == null) {
             return;
@@ -96,6 +116,11 @@ class SettingsFragment : Fragment() {
             Integer.parseInt(restInput!!.text.toString())
         );
 
+        outState.putInt(
+            "settings.roundsCount",
+            Integer.parseInt(roundsCountInput!!.text.toString())
+        );
+
         super.onSaveInstanceState(outState);
     }
 
@@ -107,7 +132,8 @@ class SettingsFragment : Fragment() {
         }
         mainActivity!!.savePreferences(
             Integer.parseInt(activeInput!!.text.toString()),
-            Integer.parseInt(restInput!!.text.toString())
+            Integer.parseInt(restInput!!.text.toString()),
+            Integer.parseInt(roundsCountInput!!.text.toString())
         );
     }
 
@@ -118,6 +144,7 @@ class SettingsFragment : Fragment() {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, active);
                     putInt(ARG_PARAM2, rest);
+                    putInt(ARG_PARAM3, rounds);
                 }
             };
     }
@@ -125,10 +152,11 @@ class SettingsFragment : Fragment() {
     private fun startTimer() {
         var activeTime = Integer.parseInt(requireView().findViewById<EditText>(R.id.activeTime).text.toString());
         var restTime = Integer.parseInt(requireView().findViewById<EditText>(R.id.restTime).text.toString());
+        var rounds = Integer.parseInt(requireView().findViewById<EditText>(R.id.roundsCount).text.toString());
         if (activeTime < 5)
             activeTime = 5;
         if (restTime < 0)
             restTime = 0;
-        mainActivity!!.startTimer(activeTime, restTime);
+        mainActivity!!.startTimer(activeTime, restTime, rounds);
     }
 }
