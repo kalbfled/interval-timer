@@ -28,10 +28,11 @@ class MainActivity : AppCompatActivity() {
         val prefs = getSharedPreferences(packageName, MODE_PRIVATE);
         val activeTime = prefs.getInt("activeTime", 45);
         val restTime = prefs.getInt("restTime", 15);
+        val rounds = prefs.getInt("rounds", 0);
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.mainFrame, SettingsFragment.newInstance(activeTime, restTime))
+                .replace(R.id.mainFrame, SettingsFragment.newInstance(activeTime, restTime, rounds))
                 .commit();
         }
 
